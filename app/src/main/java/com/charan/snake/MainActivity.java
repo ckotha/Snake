@@ -15,7 +15,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
@@ -28,6 +27,7 @@ public class MainActivity extends Activity {
     public static final int SWIPE_THRESHOLD = 120;
     public static final int VELOCITY_THRESHOLD = 300;
     boolean paused = false;
+    boolean slowActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +99,7 @@ public class MainActivity extends Activity {
                 if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > VELOCITY_THRESHOLD) {
                     if (diffX > 0) {
                         snakeEngine.heading = snakeEngine.heading.RIGHT;
-                        //Log.i("INFO", "right");
                     } else {
-                        //Log.i("INFO", "left");
                         snakeEngine.heading = snakeEngine.heading.LEFT;
                     }
                     result = true;
@@ -110,10 +108,8 @@ public class MainActivity extends Activity {
                 if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > VELOCITY_THRESHOLD) {
                     //up or down swipe
                     if (diffY > 0) {
-                        //Log.i("INFO", "down");
                         snakeEngine.heading = snakeEngine.heading.DOWN;
                     } else {
-                        //Log.i("INFO", "up");
                         snakeEngine.heading = snakeEngine.heading.UP;
                     }
                     result = true;
@@ -136,8 +132,9 @@ public class MainActivity extends Activity {
                 if (prediction.score > 3.0) {
 
                     Toast.makeText(MainActivity.this, prediction.name, Toast.LENGTH_SHORT).show();
-                    if (prediction.name.equalsIgnoreCase("slow down")) {
+                    if (prediction.name.equalsIgnoreCase("slow down") && !slowActive) {
                         snakeEngine.FPS = 5;
+                        slowActive = true;
                         startTimer();
                     } else if (prediction.name.equalsIgnoreCase("stop")) {
                         if (paused) {
@@ -147,7 +144,7 @@ public class MainActivity extends Activity {
                             snakeEngine.pause();
                             paused = true;
                         }
-                    } else if (prediction.name.equalsIgnoreCase("greater")) {
+                    } else if (prediction.name.equalsIgnoreCase("greater") && !slowActive) {
                         snakeEngine.greater = true;
                     }
                 }
@@ -157,15 +154,18 @@ public class MainActivity extends Activity {
 
     private void startTimer() {
 
-        new CountDownTimer(5000, 1000) {
+        new CountDownTimer(10000, 1000) {
 
             @Override
             public void onTick(long millisUntilFinished) {
+                if (millisUntilFinished <= 5000) {
+                    snakeEngine.FPS = 10;
+                }
             }
 
             @Override
             public void onFinish() {
-                snakeEngine.FPS = 10;
+                slowActive = false;
             }
         }.start();
 

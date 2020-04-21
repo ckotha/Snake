@@ -37,14 +37,14 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
     private int blockSize;
 
-    private final int NUM_BLOCKS_WIDE = 40;
+    private final int NUM_BLOCKS_WIDE = 15;
     private int numBlocksHigh;
 
     private long nextFrameTime;
 
     public long FPS = 10;
 
-    private final long MILLIS_PER_SECOND = 1000;
+    private final long MILLIS_PER_SECOND = 1300;
 
     private int score;
 
@@ -73,6 +73,8 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
         snakeX = new int[200];
         snakeY = new int[200];
+        snakeX[0] = NUM_BLOCKS_WIDE / 2;
+        snakeY[0] = numBlocksHigh / 2;
 
         numBobs = 1;
         greater = false;
@@ -140,7 +142,14 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private void eatBob() {
         snakeLength++;
         spawnBob();
-        score = score + 1;
+        if (score >= 100) {
+            score += 20;
+        } else if (score >= 200) {
+            score += 40;
+        } else {
+            score += 10;
+        }
+
     }
 
     private void moveSnake() {
@@ -172,7 +181,6 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     private boolean detectDeath() {
         boolean dead = false;
 
-        // Hit the screen edge
         if (snakeX[0] == -1
                 || snakeX[0] >= NUM_BLOCKS_WIDE
                 || snakeY[0] == -1
@@ -180,7 +188,6 @@ public class SnakeEngine extends SurfaceView implements Runnable {
             dead = true;
         }
 
-        // Eaten itself?
         for (int i = snakeLength - 1; i > 0; i--) {
             if ((i > 4) && (snakeX[0] == snakeX[i]) && (snakeY[0] == snakeY[i])) {
                 dead = true;
