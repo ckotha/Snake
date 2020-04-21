@@ -29,11 +29,11 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
     private int snakeLength;
 
-    private ArrayList<Integer> bobX;
-    private ArrayList<Integer> bobY;
+    private ArrayList<Integer> appleX;
+    private ArrayList<Integer> appleY;
 
     public boolean greater;
-    public int numBobs;
+    public int numApples;
 
     private int blockSize;
 
@@ -76,11 +76,11 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         snakeX[0] = NUM_BLOCKS_WIDE / 2;
         snakeY[0] = numBlocksHigh / 2;
 
-        numBobs = 1;
+        numApples = 1;
         greater = false;
 
-        bobX = new ArrayList<>();
-        bobY = new ArrayList<>();
+        appleX = new ArrayList<>();
+        appleY = new ArrayList<>();
         newGame();
     }
 
@@ -114,34 +114,31 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         snakeX[0] = NUM_BLOCKS_WIDE / 2;
         snakeY[0] = numBlocksHigh / 2;
         greater = false;
-
-        spawnBob();
-
+        spawnApple();
         score = 0;
-
         nextFrameTime = System.currentTimeMillis();
     }
 
-    public void spawnBob() {
-        if (bobX.size() == 0) {
+    public void spawnApple() {
+        if (appleX.size() == 0) {
             int count = 0;
             if (greater) {
-                numBobs++;
+                numApples++;
             }
-            while (count < numBobs) {
+            while (count < numApples) {
                 Random random = new Random();
-                bobX.add(random.nextInt(NUM_BLOCKS_WIDE - 1) + 1);
-                bobY.add(random.nextInt(numBlocksHigh - 1) + 1);
+                appleX.add(random.nextInt(NUM_BLOCKS_WIDE - 1) + 1);
+                appleY.add(random.nextInt(numBlocksHigh - 1) + 1);
                 count++;
             }
             greater = false;
-            numBobs = 1;
+            numApples = 1;
         }
     }
 
-    private void eatBob() {
+    private void eatApple() {
         snakeLength++;
-        spawnBob();
+        spawnApple();
         if (score >= 100) {
             score += 20;
         } else if (score >= 200) {
@@ -198,16 +195,14 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     }
 
     public void update() {
-        for (int i = 0; i < bobX.size(); i++) {
-            if (snakeX[0] == bobX.get(i) && snakeY[0] == bobY.get(i)) {
-                bobX.remove(i);
-                bobY.remove(i);
-                eatBob();
+        for (int i = 0; i < appleX.size(); i++) {
+            if (snakeX[0] == appleX.get(i) && snakeY[0] == appleY.get(i)) {
+                appleX.remove(i);
+                appleY.remove(i);
+                eatApple();
             }
         }
-
         moveSnake();
-
         if (detectDeath()) {
             newGame();
         }
@@ -217,11 +212,8 @@ public class SnakeEngine extends SurfaceView implements Runnable {
         if (surfaceHolder.getSurface().isValid()) {
             int offset = 255 / snakeLength;
             canvas = surfaceHolder.lockCanvas();
-
             canvas.drawColor(Color.argb(255, 0, 0, 0));
-
             paint.setColor(Color.argb(255, 255, 255, 255));
-
             paint.setTextSize(90);
             canvas.drawText("Score: " + score, 10, 70, paint);
 
@@ -236,11 +228,11 @@ public class SnakeEngine extends SurfaceView implements Runnable {
 
             paint.setColor(Color.argb(255, 255, 0, 0));
 
-            for (int i = 0; i < bobX.size(); i++) {
-                canvas.drawRect(bobX.get(i) * blockSize,
-                        (bobY.get(i) * blockSize),
-                        (bobX.get(i) * blockSize) + blockSize,
-                        (bobY.get(i) * blockSize) + blockSize,
+            for (int i = 0; i < appleX.size(); i++) {
+                canvas.drawRect(appleX.get(i) * blockSize,
+                        (appleY.get(i) * blockSize),
+                        (appleX.get(i) * blockSize) + blockSize,
+                        (appleY.get(i) * blockSize) + blockSize,
                         paint);
 
             }
@@ -250,12 +242,10 @@ public class SnakeEngine extends SurfaceView implements Runnable {
     }
 
     public boolean updateRequired() {
-
         if (nextFrameTime <= System.currentTimeMillis()) {
             nextFrameTime = System.currentTimeMillis() + MILLIS_PER_SECOND / FPS;
             return true;
         }
-
         return false;
     }
 }
